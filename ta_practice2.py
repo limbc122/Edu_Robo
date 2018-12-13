@@ -7,6 +7,7 @@ from iexfinance.stocks import get_historical_data
 from datetime import datetime
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import scorer, accuracy_score
 
 
 def get_stats(s, n=252):
@@ -33,7 +34,7 @@ def get_stats(s, n=252):
 
 
 start = datetime(2015,1,1)
-end = datetime(2018,1,1)
+end = datetime(2018,11,1)
 
 Df = get_historical_data('GLD', start=start, end=end, output_format='pandas')
 
@@ -72,10 +73,16 @@ cls.fit(scaler.transform(X_train), y_train)
 y_predict = cls.predict(scaler.transform(X_test))
 
 Df['Sig'][split:] = y_predict
-
 Df['Strategy_Return'] = Df['Sig'] * Df['Ret']
 
 get_stats(Df.Strategy_Return[split:])
-Df.Strategy_Return[split:].cumsum().plot(figsize=(10,5))
-plt.title("Strategy Return")
+accuracy = accuracy_score(y_test, pd.DataFrame(cls.predict(scaler.transform(X_test))))
+print("Accuracy : " + str(accuracy))
+
+Df['DRet'] = np.log(Df['close'].shift(-1) / Df['close'])
+Df.Strategy_Return[split:].cumsum().plot(figsize=(10,5), color='r', label='Strategy')
+Df.DRet[split:].cumsum().plot(color='g', label='Hold')
+plt.title("Strategy Return vs. Buy&Hold")
+plt.legend()
 plt.show()
+
