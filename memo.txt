@@ -7,3 +7,6 @@ http://www.pythonscraping.com/pages/page1.html
   
 
 r'http://finviz.com/quote.ashx?t={}'.format(ticker.lower()
+
+
+https://pinkwink.kr/1119?category=580892
